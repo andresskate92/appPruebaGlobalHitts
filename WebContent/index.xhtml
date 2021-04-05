@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"> 
+
+<h:head>
+	<title>.: Gestionar Tickets :.</title>
+</h:head> 
+<h:body> 
+	
+	<p:growl id="growlGestionarTicket" life="3000" showDetail="true"/>
+	
+	<h:form id="formCriterios">
+		
+		<div id="divBtn" align="right">
+			<p:commandButton id="btnAgregar" value="Nuevo Ticket" oncomplete="PF('dlgTicketsNew').show();"/>
+		</div>
+	</h:form>
+	
+	<p:separator/>
+	
+	<h:form id="formGestionarTicket">
+		
+		<p:fieldset id="flstGestionarTickets" legend="Gestionar Tickets">
+		
+			<p:dataTable id="dtGestionarTickets" value="#{gestionarTicketsBean.listaGestionarTicketsCustomEntity}" var="listTickets" rows="15">
+			
+				<p:column headerText="Id" >
+					<div align="center">
+						<h:outputText value="#{listTickets.idGestionarTicket}" />
+					</div>
+				</p:column>
+				
+				<p:column headerText="Descripcion Solicitud" >
+					<div align="center">
+						<h:outputText value="#{listTickets.descripcionSolicitud}" />
+					</div>
+				</p:column>
+			
+				<p:column headerText="Estado" >
+					<div align="center">
+						<h:outputText value="#{listTickets.estado}" />
+					</div>
+				</p:column>
+				
+				<p:column headerText="Prioridad" >
+					<div align="center">
+						<h:outputText value="#{listTickets.prioridad}" />
+					</div>
+				</p:column>
+				
+				<p:column headerText="Solicitante" >
+					<div align="center">
+						<h:outputText value="#{listTickets.solicitante}" />
+					</div>
+				</p:column>
+				
+				<p:column headerText="Fecha Solicitud" >
+					<div align="center">
+						<h:outputText value="#{listTickets.fechaSolicitud}">
+							<f:convertDateTime pattern="dd-MM-yyyy - hh:mm:ss"/>
+						</h:outputText>
+					</div>
+				</p:column>
+				
+				<p:column headerText="Accion">
+					<div align="center">
+						<p:commandButton icon="ui-icon-pencil"  oncomplete="PF('dlgTicketsUpdate').show();" process="@form" update=":formDialogUpdate">
+							<f:setPropertyActionListener value="#{listTickets}" target="#{gestionarTicketsBean.gestionarTicketsCustomEntityUpdate}" />
+						</p:commandButton>
+						<p:commandButton icon="ui-icon-trash" actionListener="#{gestionarTicketsBean.eliminarDatos(listTickets)}" update=":formGestionarTicket, growlGestionarTicket" process="@form" ajax="true">
+							<p:confirm header="Confirmacion" message="Esta seguro de desea elimanar el registro selecionado?" icon="ui-icon-alert"/>
+						</p:commandButton>
+					</div>
+				</p:column>
+				
+				
+			</p:dataTable>
+		
+		</p:fieldset>
+	
+	</h:form>
+	
+	<h:form id="formDialog">
+		<p:dialog id="dlgNewTickets" header="Registrar Nuevo Tickets" widgetVar="dlgTicketsNew" modal="true" position="center" closeOnEscape="true" responsive="true" resizable="false" draggable="false">
+		
+			<h:panelGrid id="plgTicketsModal" columns="4" cellspacing="10">
+				
+				<p:outputLabel value="Ingresar Descripcion del tickets"/>
+				<p:inputText value="#{gestionarTicketsBean.gestionarTicketsCustomEntity.descripcionSolicitud}" required="true" requiredMessage="Ingresar descripcion del tickets"/>
+				
+				<p:outputLabel value="Selecionar estado del tickets"/>
+				<p:selectOneMenu value="#{gestionarTicketsBean.gestionarTicketsCustomEntity.estado}" required="true" requiredMessage="Ingresar el estado del tickets">
+					<f:selectItem itemLabel="Selecionar" itemValue=""/>
+					<f:selectItems value="#{gestionarTicketsBean.listaEstadoTickets()}" var="esta" itemLabel="#{esta.descripcionEstado}" itemValue="#{esta.codEstado}"/>
+				</p:selectOneMenu>
+				
+				<p:outputLabel value="Nombre del Solicitante"/>
+				<p:inputText value="#{gestionarTicketsBean.gestionarTicketsCustomEntity.solicitante}" required="true" requiredMessage="Ingresar nombre del solicitante"/>
+				
+				<p:outputLabel value="Selecionar prioridad del tickets"/>
+				<p:selectOneMenu value="#{gestionarTicketsBean.gestionarTicketsCustomEntity.prioridad}" required="true" requiredMessage="Ingresar la prioridad del tickets">
+					<f:selectItem itemLabel="Selecionar" itemValue=""/>
+					<f:selectItems value="#{gestionarTicketsBean.listaPrioridadTickets()}" var="prio" itemLabel="#{prio.descripcionPrioridad}" itemValue="#{prio.codPrioridad}"/>
+				</p:selectOneMenu>
+				
+				
+			</h:panelGrid>
+			
+			<p:separator/>
+			
+			<div align="center">
+				<p:commandButton id="btnAgregarTickets" value="Agregar" action="#{gestionarTicketsBean.newGestionarTickets()}" update="formGestionarTicket:dtGestionarTickets, growlGestionarTicket" ajax="false" />
+			</div>
+		
+		</p:dialog>
+	</h:form>
+	
+	
+	<h:form id="formDialogUpdate">
+		<p:dialog id="dlgUpdateTickets" header="Actualizar Nuevo Tickets" widgetVar="dlgTicketsUpdate" modal="true" position="center" closeOnEscape="true" responsive="true" resizable="false" draggable="false">
+		
+			<h:panelGrid id="plgTicketsModal" columns="4" cellspacing="10">
+				
+				<p:outputLabel value="Ingresar Descripcion del tickets"/>
+				<p:inputText value="#{gestionarTicketsBean.gestionarTicketsCustomEntityUpdate.descripcionSolicitud}" required="true" requiredMessage="Ingresar descripcion del tickets"/>
+				
+				<p:outputLabel value="Selecionar estado del tickets"/>
+				<p:selectOneMenu value="#{gestionarTicketsBean.gestionarTicketsCustomEntityUpdate.estado}" required="true" requiredMessage="Ingresar el estado del tickets">
+					<f:selectItem itemLabel="Selecionar" itemValue=""/>
+					<f:selectItems value="#{gestionarTicketsBean.listaEstadoTickets()}" var="est" itemLabel="#{est.descripcionEstado}" itemValue="#{est.codEstado}"/>
+				</p:selectOneMenu>
+				
+				<p:outputLabel value="Nombre del Solicitante"/>
+				<p:inputText value="#{gestionarTicketsBean.gestionarTicketsCustomEntityUpdate.solicitante}" required="true" requiredMessage="Ingresar nombre del solicitante"/>
+				
+				<p:outputLabel value="Selecionar prioridad del tickets"/>
+				<p:selectOneMenu value="#{gestionarTicketsBean.gestionarTicketsCustomEntityUpdate.prioridad}" required="true" requiredMessage="Ingresar la prioridad del tickets">
+					<f:selectItem itemLabel="Selecionar" itemValue=""/>
+					<f:selectItems value="#{gestionarTicketsBean.listaPrioridadTickets()}" var="pri" itemLabel="#{pri.descripcionPrioridad}" itemValue="#{pri.codPrioridad}"/>
+				</p:selectOneMenu>
+				
+				
+			</h:panelGrid>
+			
+			<p:separator/>
+			
+			<div align="center">
+				<p:commandButton id="btnUpdateTickets" value="Update" action="#{gestionarTicketsBean.updateDatos()}" update="formGestionarTicket:dtGestionarTickets, growlGestionarTicket" ajax="false" />
+			</div>
+		
+		</p:dialog>
+	</h:form>
+	
+	<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+			<p:commandButton value="Si" type="button" icon="ui-icon-check"  styleClass="ui-confirmdialog-yes"/>
+			<p:commandButton value="No" type="button" icon="ui-icon-close" styleClass="ui-confirmdialog-no" />
+	</p:confirmDialog>
+		
+</h:body> 
+</html>
